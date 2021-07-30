@@ -17,6 +17,7 @@ add_executable(unienet
   user.h
   user.cpp
   style.css
+  wt_config.xml
 )
 
 TARGET_LINK_LIBRARIES(unienet
@@ -27,3 +28,9 @@ TARGET_LINK_LIBRARIES(unienet
 )
 
 include_directories(/usr/local/include/Wt)
+
+add_custom_command(
+        TARGET unienet POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/wt_config.xml
+                ${CMAKE_CURRENT_BINARY_DIR}/wt_config.xml)

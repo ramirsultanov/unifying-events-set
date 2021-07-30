@@ -3,6 +3,8 @@
 #include <Wt/Auth/AuthWidget.h>
 #include <Wt/Auth/PasswordService.h>
 #include <Wt/WBootstrapTheme.h>
+#include <Wt/WHBoxLayout.h>
+#include <Wt/WLeafletMap.h>
 #include <Wt/WServer.h>
 #include <Wt/WTemplate.h>
 #include <Wt/WText.h>
@@ -51,83 +53,21 @@ App::authEvent ()
 void
 App::createMainView ()
 {
-  auto t = std::make_unique<Wt::WTemplate> ();
-  //  t->setTemplateText (
-  //      "<!DOCTYPE html>"
-  //      "<html>"
-  //      "<head>"
-  //      "<title>Add Map</title>"
-
-  //      "<style type=${text_css}>"
-  //      "#map {"
-  //      "height: 400px;"
-  //      "width: 100%;"
-  //      "}"
-  //      "</ style><script>"
-  //      "function"
-  //      "initMap ()"
-  //      "{"
-  //      "const uluru = { lat : -25.344, lng : 131.036 };"
-  //      "const map = new google.maps.Map (document.getElementById (${map}),
-  //      {" "zoom : 4," "center : uluru,"
-  //      "});"
-  //      "const marker = new google.maps.Marker ({"
-  //      "position : uluru,"
-  //      "map : map,"
-  //      "});"
-  //      "}"
-  //      "</script>"
-  //      "</head>"
-  //      "<body>"
-  //      "<h3>My Google Maps Demo</h3>"
-  //      "<!--The div element for the map -->"
-  //      "<div id=${map}></div>"
-
-  //      "<!-- Async script executes immediately and must be after any DOM "
-  //      "elements used in callback. -->"
-  //      "<script"
-  //      "src=${service_url}"
-  //      "async"
-  //      "></script>"
-  //      "</body>"
-  //      "</html>");
-  //  t->bindString ("text_css", "text/css", Wt::TextFormat::Plain);
-  //  t->bindString ("map", "map", Wt::TextFormat::Plain);
-  //  t->bindString ("service_url",
-  //                 "https://maps.googleapis.com/maps/api/"
-  //                 "js?key=AIzaSyAemT9seeS35-y-yMN9TxPRnoBjtxSkti0&callback="
-  //                 "initMap&libraries=&v=weekly",
-  //                 Wt::TextFormat::Plain);
-
-  //  t->setTemplateText ("<iframe width=${width} height=${height}
-  //  style=${style} "
-  //                      "loading=${lazy} allowfullscreen
-  //                      src=${src}</iframe>");
-  //  t->bindString ("width", "600", Wt::TextFormat::XHTML);
-  //  t->bindString ("height", "450", Wt::TextFormat::XHTML);
-  //  t->bindString ("style", "border: 0", Wt::TextFormat::XHTML);
-  //  t->bindString ("loading", "lazy", Wt::TextFormat::XHTML);
-  //  t->bindString ("src",
-  //                 "https://www.google.com/maps/embed/v1/"
-  //                 "view?center=55.7879,49.1233&zoom=10&key=AIzaSyAemT9seeS35-y-"
-  //                 "yMN9TxPRnoBjtxSkti0",
-  //                 Wt::TextFormat::XHTML);
-  //  auto container = std::make_unique<Wt::WContainerWidget> ();
-  //  container->addNew<Wt::WText> (Wt::WString (
-  //      "<iframe width=\"600\" height=\"450\" style=\"border: 0\" "
-  //      "loading=\"lazy\" allowfullscreen "
-  //      "src=\"https://www.google.com/maps/embed/v1/"
-  //      "view?center=55.7879,49.1233&zoom=10&key=AIzaSyAemT9seeS35-y-"
-  //      "yMN9TxPRnoBjtxSkti0\"</iframe>"));
-  //  this->root ()->addWidget (std::move (container));
-  auto text = std::make_unique<Wt::WText> (
-      "<iframe width=\"600\" height=\"450\" style=\"border: 0\" "
-      "loading=\"lazy\" allowfullscreen "
-      "src=\"https://www.google.com/maps/embed/v1/"
-      "view?center=55.7879,49.1233&zoom=10&key=AIzaSyAemT9seeS35-y-"
-      "yMN9TxPRnoBjtxSkti0\"</iframe>",
-      Wt::TextFormat::UnsafeXHTML);
-  this->root ()->addWidget (std::move (text));
+  auto layout = std::make_unique<Wt::WHBoxLayout> ();
+  auto map = std::make_unique<Wt::WLeafletMap> ();
+  //  map->setWidth (400);
+  //  map->setHeight (400);
+  Wt::Json::Object options;
+  options["maxZoom"] = 20;
+  options["attribution"] = "&copy; <a "
+                           "href=\"https://www.openstreetmap.org/"
+                           "copyright\">OpenStreetMap</a> contributors";
+  map->addTileLayer ("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                     options);
+  map->panTo ({ 55.7930907, 49.1143051 });
+  layout->addWidget (std::move (map));
+  this->root ()->setLayout (std::move (layout));
+  //  this->root ()->addWidget (std::move (map));
 }
 
 std::unique_ptr<Wt::WApplication>
