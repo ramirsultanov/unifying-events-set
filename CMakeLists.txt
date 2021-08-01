@@ -16,6 +16,10 @@ add_executable(unienet
   session.cpp
   user.h
   user.cpp
+  event.h
+  event.cpp
+  eventdatabase.h
+  eventdatabase.cpp
   style.css
   wt_config.xml
 )
@@ -34,3 +38,11 @@ add_custom_command(
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_SOURCE_DIR}/wt_config.xml
                 ${CMAKE_CURRENT_BINARY_DIR}/wt_config.xml)
+
+add_custom_command(
+        TARGET unienet POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/style.css
+                        ${CMAKE_CURRENT_BINARY_DIR}/style.css)
+
+file(COPY ${CMAKE_SOURCE_DIR}/resources DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

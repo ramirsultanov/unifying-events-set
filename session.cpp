@@ -63,6 +63,7 @@ Session::Session (const std::string &db)
   this->mapClass<AuthInfo> ("auth_info");
   this->mapClass<AuthInfo::AuthIdentityType> ("auth_identity");
   this->mapClass<AuthInfo::AuthTokenType> ("auth_token");
+  this->mapClass<Event> ("event");
 
   try
     {
