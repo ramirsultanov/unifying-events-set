@@ -18,7 +18,8 @@ class Event
 public:
   double x;
   double y;
-  Wt::WDateTime datetime;
+  Wt::WDateTime datetimeStart;
+  Wt::WDateTime datetimeFinish;
   int participantsLimit; // "0" is for "no limit" | "1" is for "unknown"
   dbo::collection<dbo::ptr<User> > participants;
   std::string title;
@@ -30,7 +31,8 @@ public:
   {
     dbo::field (a, x, "x");
     dbo::field (a, y, "y");
-    dbo::field (a, datetime, "datetime");
+    dbo::field (a, datetimeStart, "datetimeStart");
+    dbo::field (a, datetimeFinish, "datetimeFinish");
     dbo::field (a, participantsLimit, "participantsLimit");
     dbo::hasMany (a, participants, dbo::ManyToMany, "participant_event");
     dbo::field (a, title, "title");

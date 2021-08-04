@@ -1,3 +1,32 @@
 #include "eventdatabase.h"
 
-MarkerDatabase::MarkerDatabase () {}
+EventDatabase::EventDatabase (Wt::Dbo::Session &s) : s_ (s) {}
+
+bool
+EventDatabase::addEvent (const Event &event)
+{
+  // ? Transaction
+  auto ptr = s_.add<Event> (std::make_unique<Event> (std::move (event)));
+  return (bool)ptr; // ? '!'
+}
+
+std::vector<Event> // ? unique_ptr
+EventDatabase::getEvents (
+    const std::pair<double, double> upLeftBorder,
+    const std::pair<double, double> downRightBorder) const
+{
+  std::vector<Event> events;
+  Wt::Dbo::collection<Wt::Dbo::ptr<Event> > collection
+      = s_.find<Event> ("where y < ? and x > ? and y > ? and x < ? and "
+                        "datetimeStart > ?")
+            .bind (upLeftBorder.first)
+            .bind (upLeftBorder.second)
+            .bind (downRightBorder.first)
+            .bind (downRightBorder.second)
+            .bind (Wt::WDateTime (std::chrono::system_clock::now ()));
+  std::for_each (collection.begin (), collection.end (),
+                 [&events] (Wt::Dbo::collection<Event>::iterator i) {
+                   events.push_back (*i);
+                 });
+  return events;
+}

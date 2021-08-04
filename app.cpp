@@ -10,7 +10,8 @@
 #include <Wt/WText.h>
 
 App::App (const Wt::WEnvironment &env)
-    : Wt::WApplication (env), session_ ("unienet")
+    : Wt::WApplication (env), session_ ("unienet"),
+      eventDb_ (session_) // ? check_me
 {
   this->setTitle ("unienet");
 
@@ -55,8 +56,6 @@ App::createMainView ()
 {
   auto layout = std::make_unique<Wt::WHBoxLayout> ();
   auto map = std::make_unique<Wt::WLeafletMap> ();
-  //  map->setWidth (400);
-  //  map->setHeight (400);
   Wt::Json::Object options;
   options["maxZoom"] = 20;
   options["attribution"] = "&copy; <a "
@@ -64,10 +63,15 @@ App::createMainView ()
                            "copyright\">OpenStreetMap</a> contributors";
   map->addTileLayer ("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                      options);
-  map->panTo ({ 55.7930907, 49.1143051 });
+  const std::pair<double, double> coords = { 55.7930907, 49.1143051 };
+  map->panTo ({ coords.first, coords.second });
+  //  Borders mapBorders = this->getMapBorders (map, coords);
+  //  std::vector<Event> events
+  //      = eventDb_.getEvents ({ mapBorders.up, mapBorders.left },
+  //                            { mapBorders.down, mapBorders.right });
   layout->addWidget (std::move (map));
   this->root ()->setLayout (std::move (layout));
-  //  this->root ()->addWidget (std::move (map));
+  this->root ()->mouseDragged ().connect ()
 }
 
 std::unique_ptr<Wt::WApplication>
@@ -75,6 +79,14 @@ createApplication (const Wt::WEnvironment &env)
 {
   return std::make_unique<App> (env);
 }
+
+// Borders
+// App::getMapBorders (const std::unique_ptr<Wt::WLeafletMap> &map,
+//                    const std::pair<double, double> coords) const
+//{
+//  Borders borders;
+//  borders.up = coords.second +
+//}
 
 int
 main (int argc, char **argv)
