@@ -69,9 +69,46 @@ App::createMainView ()
   //  std::vector<Event> events
   //      = eventDb_.getEvents ({ mapBorders.up, mapBorders.left },
   //                            { mapBorders.down, mapBorders.right });
-  layout->addWidget (std::move (map));
+  auto updateEvents = [&map] (const EventDatabase eventDb_) {
+    constexpr int coef = 8;
+    constexpr int width = 1920 * coef;
+    constexpr int height = 1080 * coef;
+    constexpr double maxLatitude = 90;
+    constexpr double maxLongitude = 180;
+    constexpr int zeroZoomMapSize = 256;
+    const Wt::WLeafletMap::Coordinate position = map->position ();
+    const int zoom
+        = map->zoomLevel (); // world size in pixels = {256, 256} * 2^zoom
+    const int mapSizeInPx = zeroZoomMapSize * 1 << zoom;
+    std::pair<double, double> upLeft;
+    std::pair<double, double> downRight;
+    if (mapSizeInPx >= width || mapSizeInPx >= height)
+      {
+        upLeft = { maxLatitude * height / mapSizeInPx,
+                   -maxLongitude * width / mapSizeInPx };
+        downRight = upLeft = { -maxLatitude * height / mapSizeInPx,
+                               maxLongitude * width / mapSizeInPx };
+      }
+    else
+      {
+        upLeft = { maxLatitude, -maxLongitude };
+        downRight = { -maxLatitude, maxLongitude };
+      }
+
+    std::vector<Event> events = eventDb_.getEvents (upLeft, downRight);
+    for (Event event : events)
+      {
+        const Wt::WLeafletMap::Coordinate coords = { event.x, event.y };
+        std::unique_ptr<Wt::WLeafletMap::WidgetMarker> marker
+            = std::make_unique<Wt::WLeafletMap::WidgetMarker> (coords);
+        map->addMarker (std::move (marker));
+      }
+  };
+  map->zoomLevelChanged ().connect () layout->addWidget (std::move (map));
   this->root ()->setLayout (std::move (layout));
-  this->root ()->mouseDragged ().connect ()
+
+  this->root ()->mouseDragged ().connect ();
+  this->root ()->mo
 }
 
 std::unique_ptr<Wt::WApplication>
