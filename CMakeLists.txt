@@ -22,6 +22,8 @@ add_executable(unienet
   eventdatabase.cpp
   markerwidget.h
   markerwidget.cpp
+  markerinfowidget.h
+  markerinfowidget.cpp
   style.css
   wt_config.xml
 )

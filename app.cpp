@@ -8,6 +8,10 @@
 #include <Wt/WServer.h>
 #include <Wt/WTemplate.h>
 #include <Wt/WText.h>
+#include <functional>
+
+#include "markerinfowidget.h"
+#include "markerwidget.h"
 
 App::App (const Wt::WEnvironment &env)
     : Wt::WApplication (env), session_ ("unienet"),
@@ -69,46 +73,13 @@ App::createMainView ()
   //  std::vector<Event> events
   //      = eventDb_.getEvents ({ mapBorders.up, mapBorders.left },
   //                            { mapBorders.down, mapBorders.right });
-  auto updateEvents = [&map] (const EventDatabase eventDb_) {
-    constexpr int coef = 8;
-    constexpr int width = 1920 * coef;
-    constexpr int height = 1080 * coef;
-    constexpr double maxLatitude = 90;
-    constexpr double maxLongitude = 180;
-    constexpr int zeroZoomMapSize = 256;
-    const Wt::WLeafletMap::Coordinate position = map->position ();
-    const int zoom
-        = map->zoomLevel (); // world size in pixels = {256, 256} * 2^zoom
-    const int mapSizeInPx = zeroZoomMapSize * 1 << zoom;
-    std::pair<double, double> upLeft;
-    std::pair<double, double> downRight;
-    if (mapSizeInPx >= width || mapSizeInPx >= height)
-      {
-        upLeft = { maxLatitude * height / mapSizeInPx,
-                   -maxLongitude * width / mapSizeInPx };
-        downRight = upLeft = { -maxLatitude * height / mapSizeInPx,
-                               maxLongitude * width / mapSizeInPx };
-      }
-    else
-      {
-        upLeft = { maxLatitude, -maxLongitude };
-        downRight = { -maxLatitude, maxLongitude };
-      }
-
-    std::vector<Event> events = eventDb_.getEvents (upLeft, downRight);
-    for (Event event : events)
-      {
-        const Wt::WLeafletMap::Coordinate coords = { event.x, event.y };
-        std::unique_ptr<Wt::WLeafletMap::WidgetMarker> marker
-            = std::make_unique<Wt::WLeafletMap::WidgetMarker> (coords);
-        map->addMarker (std::move (marker));
-      }
-  };
-  map->zoomLevelChanged ().connect () layout->addWidget (std::move (map));
+  this->updateEvents (map.get ());
+  map->zoomLevelChanged ().connect (
+      [&map, this] (int zoom) { this->updateEvents (map.get ()); });
+  layout->addWidget (std::move (map));
   this->root ()->setLayout (std::move (layout));
-
-  this->root ()->mouseDragged ().connect ();
-  this->root ()->mo
+  this->root ()->mouseDragged ().connect (
+      [&map, this] (Wt::WMouseEvent mE) { this->updateEvents (map.get ()); });
 }
 
 std::unique_ptr<Wt::WApplication>
@@ -124,6 +95,57 @@ createApplication (const Wt::WEnvironment &env)
 //  Borders borders;
 //  borders.up = coords.second +
 //}
+
+void
+App::updateEvents (Wt::WLeafletMap *map)
+{
+  constexpr int coef = 8;
+  constexpr int width = 1920 * coef;
+  constexpr int height = 1080 * coef;
+  constexpr double maxLatitude = 90;
+  constexpr double maxLongitude = 180;
+  constexpr int zeroZoomMapSize = 256;
+  const Wt::WLeafletMap::Coordinate position = map->position ();
+  const int zoom
+      = map->zoomLevel (); // world size in pixels = {256, 256} * 2^zoom
+  const int mapSizeInPx = zeroZoomMapSize * 1 << zoom;
+  std::pair<double, double> upLeft;
+  std::pair<double, double> downRight;
+  if (mapSizeInPx >= width || mapSizeInPx >= height)
+    {
+      upLeft = { maxLatitude * height / mapSizeInPx + position.latitude (),
+                 -maxLongitude * width / mapSizeInPx + position.longitude () };
+      downRight = upLeft
+          = { -maxLatitude * height / mapSizeInPx + position.latitude (),
+              maxLongitude * width / mapSizeInPx + position.longitude () };
+    }
+  else
+    {
+      upLeft = { maxLatitude, -maxLongitude };
+      downRight = { -maxLatitude, maxLongitude };
+    }
+
+  std::vector<Event> events = this->eventDb_.getEvents (upLeft, downRight);
+  for (Event &event : events)
+    {
+      const Wt::WLeafletMap::Coordinate coords = { event.x, event.y };
+      std::unique_ptr<MarkerWidget> mWidget
+          = std::make_unique<MarkerWidget> (event);
+      std::unique_ptr<Wt::WLeafletMap::WidgetMarker> marker
+          = std::make_unique<Wt::WLeafletMap::WidgetMarker> (
+              coords, std::move (mWidget));
+      ((MarkerWidget *)marker->widget ())
+          ->showInfo.connect ([this] (const std::shared_ptr<Event> event) {
+            this->showEventInfo (event);
+          });
+      map->addMarker (std::move (marker));
+    }
+}
+
+void
+App::showEventInfo (const std::shared_ptr<Event> event)
+{
+}
 
 int
 main (int argc, char **argv)

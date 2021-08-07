@@ -24,9 +24,9 @@ EventDatabase::getEvents (
             .bind (downRightBorder.first)
             .bind (downRightBorder.second)
             .bind (Wt::WDateTime (std::chrono::system_clock::now ()));
-  std::for_each (collection.begin (), collection.end (),
-                 [&events] (Wt::Dbo::collection<Event>::iterator i) {
-                   events.push_back (*i);
-                 });
+  for (Wt::Dbo::ptr<Event> event : collection)
+    {
+      events.push_back (*event.get ());
+    }
   return events;
 }
