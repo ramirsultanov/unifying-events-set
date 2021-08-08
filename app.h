@@ -4,6 +4,7 @@
 #include <Wt/WApplication.h>
 
 #include "eventdatabase.h"
+#include "markerwidget.h"
 #include "session.h"
 
 struct Borders;
@@ -16,6 +17,7 @@ public:
 private:
   Session session_;
   EventDatabase eventDb_;
+  Wt::WContainerWidget *eventWidget_;
 
   void authEvent ();
   void createMainView ();
@@ -32,7 +34,11 @@ private:
   //  }
   Borders getMapBorders (const std::unique_ptr<Wt::WLeafletMap> &map,
                          const std::pair<double, double> coords) const;
-  void showEventInfo (const std::shared_ptr<Event> event);
+  void showEventInfo (const std::shared_ptr<MarkerWidget> markerWidget);
+  void hideEventInfo (const std::shared_ptr<MarkerWidget> markerWidget);
+
+  void showEventReg ();
+  void cleanEventPlace ();
 };
 
 struct Borders

@@ -19,11 +19,14 @@ public:
   double x;
   double y;
   Wt::WDateTime datetimeStart;
-  Wt::WDateTime datetimeFinish;
-  int participantsLimit; // "0" is for "no limit" | "1" is for "unknown"
+  Wt::WDateTime datetimeFinish; /// NaN DateTime is for "unknown"
+  int participantsLimit; /// "0" is for "no limit" | "1" is for "unknown"
   dbo::collection<dbo::ptr<User> > participants;
   std::string title;
   std::string description;
+
+  Wt::WString datetimeFinish_to_string ();
+  Wt::WString participantsLimit_to_string ();
 
   template <class Action>
   void

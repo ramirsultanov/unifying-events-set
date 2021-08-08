@@ -24,6 +24,8 @@ add_executable(unienet
   markerwidget.cpp
   markerinfowidget.h
   markerinfowidget.cpp
+  markerformwidget.h
+  markerformwidget.cpp
   style.css
   wt_config.xml
 )

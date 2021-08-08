@@ -8,8 +8,10 @@
 #include <Wt/WServer.h>
 #include <Wt/WTemplate.h>
 #include <Wt/WText.h>
+
 #include <functional>
 
+#include "markerformwidget.h"
 #include "markerinfowidget.h"
 #include "markerwidget.h"
 
@@ -135,16 +137,48 @@ App::updateEvents (Wt::WLeafletMap *map)
           = std::make_unique<Wt::WLeafletMap::WidgetMarker> (
               coords, std::move (mWidget));
       ((MarkerWidget *)marker->widget ())
-          ->showInfo.connect ([this] (const std::shared_ptr<Event> event) {
-            this->showEventInfo (event);
-          });
+          ->showInfo.connect (
+              [this, &marker] (const std::shared_ptr<Event> event) {
+                this->showEventInfo (std::shared_ptr<MarkerWidget> (
+                    (MarkerWidget *)marker->widget ()));
+              });
       map->addMarker (std::move (marker));
     }
 }
 
 void
-App::showEventInfo (const std::shared_ptr<Event> event)
+App::showEventInfo (const std::shared_ptr<MarkerWidget> markerWidget)
 {
+  this->cleanEventPlace ();
+  this->eventWidget_ = markerWidget->infoWidget ()->createWidget ().get ();
+  this->root ()->layout ()->addWidget (
+      markerWidget->infoWidget ()->createWidget ());
+  markerWidget->infoWidget ()->hideEventInfo.connect (this,
+                                                      &App::hideEventInfo);
+  markerWidget->infoWidget ()->showParticipants.connect ();
+}
+
+void
+App::hideEventInfo (const std::shared_ptr<MarkerWidget> markerWidget)
+{
+  this->root ()->layout ()->removeWidget ();
+}
+
+void
+App::cleanEventPlace ()
+{
+  if (this->eventWidget_ == nullptr)
+    {
+      this->root ()->layout ()->removeWidget (this->eventWidget_);
+      this->eventWidget_ = nullptr;
+    }
+}
+
+void
+App::showEventReg ()
+{
+  this->cleanEventPlace ();
+  this->root ()->layout ()->addWidget (std::make_unique<MarkerFormWidget> ());
 }
 
 int

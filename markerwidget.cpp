@@ -11,10 +11,16 @@ MarkerWidget::MarkerWidget (const Event &event)
 void
 MarkerWidget::info ()
 {
-  MarkerInfoWidget info (this->event_);
+  info_ = std::make_unique<MarkerInfoWidget> (this->event_);
 }
 
 void
 MarkerWidget::setStyle ()
 {
+}
+
+std::unique_ptr<MarkerInfoWidget>
+MarkerWidget::infoWidget ()
+{
+  return std::move (this->info_);
 }

@@ -6,6 +6,7 @@
 #include <string>
 
 #include "event.h"
+#include "markerinfowidget.h"
 
 class MarkerWidget : public Wt::WPushButton
 {
@@ -13,8 +14,11 @@ public:
   Wt::Signals::Signal<const std::shared_ptr<Event> > showInfo;
 
   MarkerWidget (const Event &event);
+  std::unique_ptr<MarkerInfoWidget> infoWidget ();
 
 private:
+  std::unique_ptr<MarkerInfoWidget> info_;
+
   void info ();
   const Event &event_;
   void setStyle ();
