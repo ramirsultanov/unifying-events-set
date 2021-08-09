@@ -152,16 +152,44 @@ App::showEventInfo (const std::shared_ptr<MarkerWidget> markerWidget)
   this->cleanEventPlace ();
   this->eventWidget_ = markerWidget->infoWidget ()->createWidget ().get ();
   this->root ()->layout ()->addWidget (
-      markerWidget->infoWidget ()->createWidget ());
+      std::unique_ptr<Wt::WContainerWidget> (this->eventWidget_));
   markerWidget->infoWidget ()->hideEventInfo.connect (this,
                                                       &App::hideEventInfo);
-  markerWidget->infoWidget ()->showParticipants.connect ();
+  markerWidget->infoWidget ()->showParticipants.connect (
+      this, &App::showEventParticipants);
 }
 
 void
-App::hideEventInfo (const std::shared_ptr<MarkerWidget> markerWidget)
+App::hideEventInfo ()
 {
-  this->root ()->layout ()->removeWidget ();
+  this->root ()->layout ()->removeWidget (this->eventWidget_);
+}
+
+void
+App::showEventParticipants ()
+{
+  //  this->root ()->layout ()->addWidget ()
+}
+
+void
+App::hideEventParticipants ()
+{
+  //  this->root ()->layout ()->removeWidget ();
+}
+
+void
+App::showEventReg ()
+{
+  this->cleanEventPlace ();
+  this->eventWidget_ = std::make_unique<MarkerFormWidget> ().get ();
+  this->root ()->layout ()->addWidget (
+      std::unique_ptr<Wt::WContainerWidget> (this->eventWidget_)); // ?! check
+}
+
+void
+App::hideEventReg ()
+{
+  this->root ()->layout ()->removeWidget (this->eventWidget_);
 }
 
 void
@@ -172,13 +200,6 @@ App::cleanEventPlace ()
       this->root ()->layout ()->removeWidget (this->eventWidget_);
       this->eventWidget_ = nullptr;
     }
-}
-
-void
-App::showEventReg ()
-{
-  this->cleanEventPlace ();
-  this->root ()->layout ()->addWidget (std::make_unique<MarkerFormWidget> ());
 }
 
 int

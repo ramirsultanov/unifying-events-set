@@ -9,9 +9,9 @@
 class MarkerInfoWidget
 {
 public:
-  Wt::Signals::Signal<const std::shared_ptr<Event> > showEventInfo;
-  Wt::Signals::Signal<const std::shared_ptr<Event> > hideEventInfo;
-  Wt::Signals::Signal<const std::shared_ptr<Event> > showParticipants;
+  Wt::Signal<const std::shared_ptr<Event> > showEventInfo;
+  Wt::Signal<> hideEventInfo;
+  Wt::Signal<const std::shared_ptr<Event> > showParticipants;
 
   MarkerInfoWidget (const Event &event);
   std::unique_ptr<Wt::WContainerWidget> createWidget () const;

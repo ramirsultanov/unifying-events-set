@@ -35,9 +35,11 @@ private:
   Borders getMapBorders (const std::unique_ptr<Wt::WLeafletMap> &map,
                          const std::pair<double, double> coords) const;
   void showEventInfo (const std::shared_ptr<MarkerWidget> markerWidget);
-  void hideEventInfo (const std::shared_ptr<MarkerWidget> markerWidget);
-
+  void hideEventInfo ();
+  void showEventParticipants ();
+  void hideEventParticipants ();
   void showEventReg ();
+  void hideEventReg ();
   void cleanEventPlace ();
 };
 

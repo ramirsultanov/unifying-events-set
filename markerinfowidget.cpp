@@ -29,14 +29,14 @@ MarkerInfoWidget::createWidget () const
                          1);
   auto participantsButton = std::make_unique<Wt::WPushButton> (
       std::to_string (this->event_->participants.size ()) + "/"
-      + this->event_->participantsLimit_to_string ()); // ? tr template
+      + this->event_
+            ->participantsLimit_to_string ()); // ? to_string() template
   participantsButton->clicked ().connect (
       [this] () { this->showParticipants.emit (this->event_); });
   topHLayout->addWidget (std::move (participantsButton));
   topHLayout->addWidget (std::make_unique<Wt::WLabel> (), 1);
   auto closeButton = std::make_unique<Wt::WPushButton> ("close");
-  closeButton->clicked ().connect (
-      [this] () { this->hideEventInfo.emit (this->event_); });
+  closeButton->clicked ().connect ([this] () { this->hideEventInfo.emit (); });
   topHLayout->addWidget (std::move (closeButton));
   vLayout->addLayout (std::move (topHLayout));
 
@@ -46,7 +46,7 @@ MarkerInfoWidget::createWidget () const
       std::make_unique<Wt::WLabel> (this->event_->datetimeStart.toString ()));
   dateHLayout->addWidget (std::make_unique<Wt::WLabel> (" - "));
   dateHLayout->addWidget (std::make_unique<Wt::WLabel> (
-      this->event_->datetimeFinish_to_string ())); // ? tr template
+      this->event_->datetimeFinish_to_string ())); // ? to_string() template
   vLayout->addLayout (std::move (dateHLayout));
 
   vLayout->addWidget (std::make_unique<Wt::WText> (this->event_->description));
