@@ -13,7 +13,15 @@ class MarkerWidget : public Wt::WPushButton
 public:
   Wt::Signals::Signal<const std::shared_ptr<Event> > showInfo;
 
+  /*!
+   * \brief Constructs marker interactable view
+   * \param event is event based on which the interactable view is created
+   */
   MarkerWidget (const Event &event);
+  /*!
+   * \brief A info widget getter
+   * \return Ptr to a info widget
+   */
   std::unique_ptr<MarkerInfoWidget> infoWidget ();
 
 private:

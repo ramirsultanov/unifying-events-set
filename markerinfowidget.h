@@ -13,7 +13,15 @@ public:
   Wt::Signal<> hideEventInfo;
   Wt::Signal<const std::shared_ptr<Event> > showParticipants;
 
+  /*!
+   * \brief Constructs widget creator but not widget
+   * \param event is event based on which widget is created
+   */
   MarkerInfoWidget (const Event &event);
+  /*!
+   * \brief Creates event info view
+   * \return Ptr to the view
+   */
   std::unique_ptr<Wt::WContainerWidget> createWidget () const;
 
 private:

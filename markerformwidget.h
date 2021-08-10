@@ -24,8 +24,19 @@
 class MarkerFormWidget : public Wt::WContainerWidget
 {
 public:
+  /*!
+   * \brief Constructs empty event edit form
+   */
   MarkerFormWidget ();
+  /*!
+   * \brief Constructs event edit form with filled latitude and longitude
+   * \param coords - (latitude, longitude)
+   */
   MarkerFormWidget (Wt::WLeafletMap::Coordinate coords);
+  /*!
+   * \brief Constructs event edit form with all fields filled
+   * \param event - event to edit
+   */
   MarkerFormWidget (Event &event);
 
   Wt::Signal<const Event> saveSignal;
